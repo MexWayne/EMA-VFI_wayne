@@ -97,7 +97,7 @@ class Model:
             _, _, _, pred2 = self.net(imgs.flip(2).flip(3), timestep=timestep)
             return (pred + pred2.flip(2).flip(3)) / 2
 
-    @torch.no_grad()
+    #@torch.no_grad()
     def multi_inference(self, img0, img1, TTA = False, down_scale = 1.0, time_list=[], fast_TTA = False):
         '''
         Run backbone once, get multi frames at different timesteps
@@ -127,6 +127,16 @@ class Model:
             return pred_list
 
         imgs = torch.cat((img0, img1), 1)
+
+        #### debug #####
+        from PIL import Image
+        img_show = ((img0.flip(1).detach().squeeze()).cpu()).numpy()
+        img_show = img_show.transpose(1,2,0)
+        img_show = (img_show * 255).astype(np.uint8)
+        img_show = Image.fromarray(img_show)
+        img_show.show()
+        ################
+
         if fast_TTA:
             imgs_ = imgs.flip(2).flip(3)
             input = torch.cat((imgs, imgs_), 0)
